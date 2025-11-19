@@ -16,8 +16,8 @@ public class ImportController {
     private final ImportService importService;
 
     @PostMapping
-    public ResponseEntity<String> uploadFile(@RequestParam("file")MultipartFile file) {
+    public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
         importService.processImport(file);
-        return  ResponseEntity.ok("File received and processing started: " + file.getOriginalFilename());
+        return ResponseEntity.ok("File received and processing started: " + file.getOriginalFilename());
     }
 }

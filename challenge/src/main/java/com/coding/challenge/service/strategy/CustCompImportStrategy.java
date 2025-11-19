@@ -21,7 +21,7 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class CustCompImportStrategy implements ImportStrategy{
+public class CustCompImportStrategy implements ImportStrategy {
     private final PolicyRepository policyRepository;
 
     @Override
@@ -42,30 +42,36 @@ public class CustCompImportStrategy implements ImportStrategy{
                              .withIgnoreQuotations(true)
                              .build())
                      .build()) {
-                 String[] line;
-                 while ((line = csvReader.readNext()) != null) {
-                     if (line.length < 2) continue;
 
-                     Policy policy = new Policy();
+            String[] line;
+            while ((line = csvReader.readNext()) != null) {
+                if (line.length < 2) continue;
 
-                     policy.setChdrnum(getValueSafe(line, 0));
-                     policy.setCownnum(getValueSafe(line, 1));
-                     policy.setOwnerName(getValueSafe(line, 2));
-                     policy.setLifcNum(getValueSafe(line, 3));
-                     policy.setLifcName(getValueSafe(line, 4));
-                     policy.setAracde(getValueSafe(line, 5));
-                     policy.setAgntnum(getValueSafe(line, 6));
-                     policy.setMailAddress(getValueSafe(line, 7));
+                Policy policy = setPolicy(line);
 
-                     policiesToSave.add(policy);
-                 }
+                policiesToSave.add(policy);
+            }
 
-                 policyRepository.saveAll(policiesToSave);
-                 log.info("Successfully saved {} policies", policiesToSave.size());
+            policyRepository.saveAll(policiesToSave);
+            log.info("Successfully saved {} policies", policiesToSave.size());
         } catch (CsvValidationException e) {
             log.error("CSV Validation error", e);
             throw new IOException("Invalid CSV formoat", e);
         }
+    }
+
+    private Policy setPolicy(String[] line) {
+        Policy policy = new Policy();
+
+        policy.setChdrnum(getValueSafe(line, 0));
+        policy.setCownnum(getValueSafe(line, 1));
+        policy.setOwnerName(getValueSafe(line, 2));
+        policy.setLifcNum(getValueSafe(line, 3));
+        policy.setLifcName(getValueSafe(line, 4));
+        policy.setAracde(getValueSafe(line, 5));
+        policy.setAgntnum(getValueSafe(line, 6));
+        policy.setMailAddress(getValueSafe(line, 7));
+        return policy;
     }
 
     private String getValueSafe(String[] line, int index) {
