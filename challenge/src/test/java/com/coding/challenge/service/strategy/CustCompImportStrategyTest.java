@@ -40,17 +40,17 @@ public class CustCompImportStrategyTest {
 
     @Test
     void execute_ShouldParseCsvAndSaveToRepository() throws IOException {
-        String csvContent = "86000019|76000018|Szegedi István |76000018|Szegedi István |00X|11111|6436 Budapest Rév u. 27. |\n" +
+        String fileContent = "86000019|76000018|Szegedi István |76000018|Szegedi István |00X|11111|6436 Budapest Rév u. 27. |\n" +
                             "86000029|76000027|Fehér Katalin |76000027|Fehér Katalin |00X|11111|2345 Tatabánya Kossuth tér 6. II.209. |";
 
         MockMultipartFile file = new MockMultipartFile(
                 "file",
                 "CUSTCOMP01.TXT",
                 "text/plain",
-                csvContent.getBytes(StandardCharsets.UTF_8)
+                fileContent.getBytes(StandardCharsets.UTF_8)
         );
 
-        strategy.execute(file);
+        strategy.execute(file.getInputStream(), "CUSTCOMP01.TXT");
 
         ArgumentCaptor<List<Policy>> captor = ArgumentCaptor.forClass(List.class);
         verify(policyRepository, times(1)).saveAll(captor.capture());

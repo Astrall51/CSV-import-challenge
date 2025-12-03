@@ -36,11 +36,13 @@ public class ZtpspfImportStrategyTest {
                 1RövidSor   10.00""";
 
         MockMultipartFile file = new MockMultipartFile(
-                "file", "ZTPSPF.TXT", "text/plain",
+                "file",
+                "ZTPSPF.TXT",
+                "text/plain",
                 fileContent.getBytes(StandardCharsets.UTF_8)
         );
 
-        strategy.execute(file);
+        strategy.execute(file.getInputStream(), "ZTPSPF.TXT");
 
         ArgumentCaptor<List<SurValues>> captor = ArgumentCaptor.forClass(List.class);
         verify(repository, times(1)).saveAll(captor.capture());

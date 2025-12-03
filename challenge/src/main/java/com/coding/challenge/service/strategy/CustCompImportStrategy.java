@@ -9,10 +9,10 @@ import com.opencsv.exceptions.CsvValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -30,12 +30,12 @@ public class CustCompImportStrategy implements ImportStrategy {
     }
 
     @Override
-    public void execute(MultipartFile file) throws IOException {
-        log.info("Processing CUSTCOMP file: {}", file.getOriginalFilename());
+    public void execute(InputStream inputStream, String fileName) throws IOException {
+        log.info("Processing CUSTCOMP file: {}", fileName);
 
         List<Policy> policiesToSave = new ArrayList<>();
 
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8));
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
              CSVReader csvReader = new CSVReaderBuilder(reader)
                      .withCSVParser(new CSVParserBuilder()
                              .withSeparator('|')

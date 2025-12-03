@@ -5,10 +5,10 @@ import com.coding.challenge.repository.SurValuesRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
@@ -28,11 +28,11 @@ public class ZtpspfImportStrategy implements ImportStrategy {
     }
 
     @Override
-    public void execute(MultipartFile file) throws IOException {
-        log.info("Processing ZTPSPF (Fixed Width) file: {}", file.getOriginalFilename());
+    public void execute(InputStream inputStream, String fileName) throws IOException {
+        log.info("Processing ZTPSPF (Fixed Width) file: {}", fileName);
         List<SurValues> surValues = new ArrayList<>();
 
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8))) {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 if (line.isBlank()) continue;
@@ -53,9 +53,7 @@ public class ZtpspfImportStrategy implements ImportStrategy {
                     log.warn("Invalid number format in line: {}", line);
                     continue;
                 }
-                if (line.length() >= 54) {
-                    surValue.setValidDate(line.substring(44, 54).trim());
-                }
+                surValue.setValidDate(line.substring(44, 54).trim());
 
                 surValues.add(surValue);
             }

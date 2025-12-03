@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 @Service
@@ -21,7 +22,14 @@ public class ImportService {
     private final ImportLogRepository importLogRepository;
 
     public void processImport(MultipartFile file) {
-        String fileName = file.getOriginalFilename();
+        try {
+            processImportStream(file.getInputStream(), file.getOriginalFilename());
+        } catch (IOException e) {
+            throw new RuntimeException("Error reading multipart file", e);
+        }
+    }
+
+    public void processImportStream(InputStream inputStream, String fileName) {
         log.info("Import process started for file: {}", fileName);
 
         if (importLogRepository.existsByFileName(fileName)) {
@@ -32,10 +40,10 @@ public class ImportService {
         ImportStrategy selectedStrategy = strategies.stream()
                 .filter(strategy -> strategy.canHandle(fileName))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("No strategy found for file: {}" + fileName));
+                .orElseThrow(() -> new IllegalArgumentException("No strategy found for file: " + fileName));
 
         try {
-            selectedStrategy.execute(file);
+            selectedStrategy.execute(inputStream, fileName);
 
             importLogRepository.save(new ImportLog(fileName, ImportStatusEnum.SUCCESS));
             log.info("File processed successfully: {}", fileName);

@@ -1,11 +1,10 @@
 package com.coding.challenge.service.strategy;
 
-import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
+import java.io.InputStream;
 
 public interface ImportStrategy {
     boolean canHandle(String fileName);
 
-    void execute(MultipartFile file) throws IOException;
+    void execute(InputStream inputStream, String fileName) throws IOException;
 }

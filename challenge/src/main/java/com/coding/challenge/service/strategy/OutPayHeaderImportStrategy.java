@@ -8,10 +8,10 @@ import com.opencsv.CSVReaderBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
@@ -34,11 +34,11 @@ public class OutPayHeaderImportStrategy implements ImportStrategy {
     }
 
     @Override
-    public void execute(MultipartFile file) throws IOException {
-        log.info("Processing OUTPH file: {}", file.getOriginalFilename());
+    public void execute(InputStream inputStream, String fileName) throws IOException {
+        log.info("Processing OUTPH file: {}", fileName);
         List<OutPayHeader> outPayHeaders = new ArrayList<>();
 
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8));
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
              CSVReader csvReader = new CSVReaderBuilder(reader)
                      .withCSVParser(new CSVParserBuilder()
                              .withSeparator(';')

@@ -37,16 +37,16 @@ public class OutPayHeaderImportStrategyTest {
 
     @Test
     void execute_ShouldParseDateAndDecimalCorrectly() throws IOException {
-        String csvContent = "20930093;70027344;CUP;20200210;OUTPAY;Kovács Lajos;Budapest;20200204;100.00;OW";
+        String fileContent = "20930093;70027344;CUP;20200210;OUTPAY;Kovács Lajos;Budapest;20200204;100.00;OW";
 
         MockMultipartFile file = new MockMultipartFile(
                 "file",
                 "OUTPH.txt",
                 "text/plain",
-                csvContent.getBytes(StandardCharsets.UTF_8)
+                fileContent.getBytes(StandardCharsets.UTF_8)
         );
 
-        strategy.execute(file);
+        strategy.execute(file.getInputStream(), "OUTPH.txt");
 
         ArgumentCaptor<List<OutPayHeader>> captor = ArgumentCaptor.forClass(List.class);
         verify(repository, times(1)).saveAll(captor.capture());
