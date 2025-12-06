@@ -5,6 +5,7 @@ import com.coding.challenge.repository.OutPayHeaderRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -29,6 +30,9 @@ public class OutPayHeaderImportStrategyTest {
     @InjectMocks
     private OutPayHeaderImportStrategy strategy;
 
+    @Captor
+    private ArgumentCaptor<List<OutPayHeader>> outPayHeaderListCaptor;
+
     @Test
     void canHandle_ShouldReturnTrue_ForCorrectFileName() {
         assertTrue(strategy.canHandle("OUTPH_CUP_20200204.TXT"));
@@ -48,10 +52,9 @@ public class OutPayHeaderImportStrategyTest {
 
         strategy.execute(file.getInputStream(), "OUTPH.txt");
 
-        ArgumentCaptor<List<OutPayHeader>> captor = ArgumentCaptor.forClass(List.class);
-        verify(repository, times(1)).saveAll(captor.capture());
+        verify(repository, times(1)).saveAll(outPayHeaderListCaptor.capture());
 
-        List<OutPayHeader> savedEntities = captor.getValue();
+        List<OutPayHeader> savedEntities = outPayHeaderListCaptor.getValue();
         assertEquals(1, savedEntities.size());
 
         OutPayHeader entity = savedEntities.get(0);

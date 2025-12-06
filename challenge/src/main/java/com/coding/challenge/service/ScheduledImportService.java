@@ -65,7 +65,7 @@ public class ScheduledImportService {
         }
 
         for (File file : files) {
-                processSingleFile(file);
+            processSingleFile(file);
         }
     }
 

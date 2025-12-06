@@ -5,6 +5,7 @@ import com.coding.challenge.repository.PolicyRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -26,6 +27,9 @@ public class CustCompImportStrategyTest {
     @InjectMocks
     private CustCompImportStrategy strategy;
 
+    @Captor
+    private ArgumentCaptor<List<Policy>> policyListCaptor;
+
     @Test
     void canHandle_ShouldReturnTrue_ForValidFileName() {
         assertTrue(strategy.canHandle("CUSTCOMP01.TXT"));
@@ -33,7 +37,7 @@ public class CustCompImportStrategyTest {
     }
 
     @Test
-    void  canHandle_ShouldReturnFalse_ForInvalidFileName() {
+    void canHandle_ShouldReturnFalse_ForInvalidFileName() {
         assertFalse(strategy.canHandle("OTHERFILE.TXT"));
         assertFalse(strategy.canHandle(null));
     }
@@ -41,7 +45,7 @@ public class CustCompImportStrategyTest {
     @Test
     void execute_ShouldParseCsvAndSaveToRepository() throws IOException {
         String fileContent = "86000019|76000018|Szegedi István |76000018|Szegedi István |00X|11111|6436 Budapest Rév u. 27. |\n" +
-                            "86000029|76000027|Fehér Katalin |76000027|Fehér Katalin |00X|11111|2345 Tatabánya Kossuth tér 6. II.209. |";
+                "86000029|76000027|Fehér Katalin |76000027|Fehér Katalin |00X|11111|2345 Tatabánya Kossuth tér 6. II.209. |";
 
         MockMultipartFile file = new MockMultipartFile(
                 "file",
@@ -52,10 +56,9 @@ public class CustCompImportStrategyTest {
 
         strategy.execute(file.getInputStream(), "CUSTCOMP01.TXT");
 
-        ArgumentCaptor<List<Policy>> captor = ArgumentCaptor.forClass(List.class);
-        verify(policyRepository, times(1)).saveAll(captor.capture());
+        verify(policyRepository, times(1)).saveAll(policyListCaptor.capture());
 
-        List<Policy> savedPolicies = captor.getValue();
+        List<Policy> savedPolicies = policyListCaptor.getValue();
 
         assertEquals(2, savedPolicies.size());
 

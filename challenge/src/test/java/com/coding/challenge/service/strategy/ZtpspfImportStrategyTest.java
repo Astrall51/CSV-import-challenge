@@ -5,6 +5,7 @@ import com.coding.challenge.repository.SurValuesRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -27,13 +28,16 @@ public class ZtpspfImportStrategyTest {
     @InjectMocks
     private ZtpspfImportStrategy strategy;
 
+    @Captor
+    private ArgumentCaptor<List<SurValues>> surValuesListCaptor;
+
     @Test
     void execute_ShouldParseFixedColumnsCorrectly() throws IOException {
         String fileContent =
                 """
-                130052881     3276866.00K5003MT   WEEKEND1  2020-02-15-08.19.59.017770
-                199999999         100.00FillerText          2022-01-01
-                1RövidSor   10.00""";
+                        130052881     3276866.00K5003MT   WEEKEND1  2020-02-15-08.19.59.017770
+                        199999999         100.00FillerText          2022-01-01
+                        1RövidSor   10.00""";
 
         MockMultipartFile file = new MockMultipartFile(
                 "file",
@@ -44,10 +48,9 @@ public class ZtpspfImportStrategyTest {
 
         strategy.execute(file.getInputStream(), "ZTPSPF.TXT");
 
-        ArgumentCaptor<List<SurValues>> captor = ArgumentCaptor.forClass(List.class);
-        verify(repository, times(1)).saveAll(captor.capture());
+        verify(repository, times(1)).saveAll(surValuesListCaptor.capture());
 
-        List<SurValues> savedEntities = captor.getValue();
+        List<SurValues> savedEntities = surValuesListCaptor.getValue();
 
         assertEquals(2, savedEntities.size());
 
